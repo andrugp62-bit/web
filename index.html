@@ -69,7 +69,7 @@
 
 <script>
 /* ------------------- SONIDO CLICK ------------------- */
-const clickSound = new Audio('sounds/click.wav');
+const clickSound = new Audio('click.wav');
 
 document.addEventListener('click', (e) => {
     if(e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
@@ -120,9 +120,9 @@ window.addEventListener('load', () => {
 
 /* ------------------- MUSICA DE FONDO ------------------- */
 const playlist = [
-    'sounds/song1.mp3',
-    'sounds/song2.mp3',
-    'sounds/song3.mp3'
+    'song1.mp3',
+    'song2.mp3',
+    'song3.mp3'
 ];
 let currentTrack = 0;
 const bgAudio = new Audio();
@@ -186,3 +186,4 @@ volumeSlider.addEventListener('input', e => {
 
 </body>
 </html>
+
