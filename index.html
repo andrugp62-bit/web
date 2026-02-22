@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>FagTrack - Apelaciones de Baneos</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Pantalla de bienvenida -->
+<div id="welcomeScreen">
+    <h1>Bienvenido a FagTrack</h1>
+</div>
+
+<!-- Contenido principal oculto al inicio -->
+<div class="container" id="mainContent" style="opacity:0;">
+    <h1>Bienvenido a FagTrack</h1>
+    <p>Busca tu perfil para ver si estás en la lista de baneados.</p>
+    
+    <!-- Buscador -->
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Ingresa enlace de perfil, ID o SteamID">
+        <button id="searchBtn">Buscar</button>
+    </div>
+    
+    <!-- Lista de Baneados -->
+    <table class="table" id="banList">
+        <thead>
+            <tr>
+                <th>Perfil</th>
+                <th>Razón</th>
+                <th>Fecha de Baneo</th>
+                <th>Expira</th>
+                <th>Apelar</th>
+            </tr>
+        </thead>
+        <tbody id="banTableBody">
+            <!-- Datos dinámicos -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Asistente Anime -->
+<div id="assistant">
+    <img src="miku-normal.png" id="assistantImg">
+    <div id="assistantBubble"></div>
+</div>
+
+<!-- Mini Reproductor Flotante -->
+<div id="musicControl">
+    <div class="music-buttons">
+        <button id="prevTrack">⏮️</button>
+        <button id="playPause">▶️</button>
+        <button id="nextTrack">⏭️</button>
+    </div>
+    <div class="track-info">
+        <span id="currentTrackName">Canción 1</span>
+    </div>
+    <div class="volume-control">
+        <button id="volumeBtn">🔊</button>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.3">
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="script.js"></script>
+<script src="assistant.js"></script>
+
+<script>
+/* ------------------- SONIDO CLICK ------------------- */
+const clickSound = new Audio('sounds/click.wav');
+
+document.addEventListener('click', (e) => {
+    if(e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
+        clickSound.currentTime = 0;
+        clickSound.play();
+    }
+});
+
+/* ------------------- CURSOR ANIMADO ------------------- */
+const cursor = document.createElement('div');
+cursor.classList.add('custom-cursor');
+document.body.appendChild(cursor);
+
+document.addEventListener('mousemove', e => {
+    cursor.style.top = e.clientY + 'px';
+    cursor.style.left = e.clientX + 'px';
+});
+
+const hoverTargets = document.querySelectorAll('a, button, .btn-danger');
+hoverTargets.forEach(el => {
+    el.addEventListener('mouseenter', () => {
+        cursor.style.transform = 'scale(2)';
+        cursor.style.background = 'rgba(255,68,68,0.3)';
+    });
+    el.addEventListener('mouseleave', () => {
+        cursor.style.transform = 'scale(1)';
+        cursor.style.background = 'transparent';
+    });
+});
+
+/* ------------------- PANTALLA DE BIENVENIDA ------------------- */
+window.addEventListener('load', () => {
+    const welcome = document.getElementById('welcomeScreen');
+    const mainContent = document.getElementById('mainContent');
+    
+    setTimeout(() => {
+        welcome.style.transition = 'all 1.5s ease';
+        welcome.style.transform = 'translateY(-200px) scale(0.5)';
+        welcome.style.opacity = 0;
+
+        setTimeout(() => {
+            welcome.remove();
+            mainContent.style.transition = 'opacity 1s ease';
+            mainContent.style.opacity = 1;
+        }, 1500);
+    }, 2500);
+});
+
+/* ------------------- MUSICA DE FONDO ------------------- */
+const playlist = [
+    'sounds/song1.mp3',
+    'sounds/song2.mp3',
+    'sounds/song3.mp3'
+];
+let currentTrack = 0;
+const bgAudio = new Audio();
+bgAudio.src = playlist[currentTrack];
+bgAudio.volume = 0.3;
+bgAudio.loop = false;
+
+bgAudio.addEventListener('ended', () => {
+    currentTrack++;
+    if(currentTrack >= playlist.length) currentTrack = 0;
+    bgAudio.src = playlist[currentTrack];
+    bgAudio.play();
+});
+
+// Inicia música con primer click del usuario
+document.addEventListener('click', () => bgAudio.play(), { once: true });
+
+// Control del mini reproductor
+const playPauseBtn = document.getElementById('playPause');
+const nextBtn = document.getElementById('nextTrack');
+const prevBtn = document.getElementById('prevTrack');
+const trackName = document.getElementById('currentTrackName');
+const volumeSlider = document.getElementById('volumeSlider');
+
+function updateTrackName() {
+    trackName.textContent = playlist[currentTrack].split('/').pop();
+}
+updateTrackName();
+
+playPauseBtn.addEventListener('click', () => {
+    if(bgAudio.paused) {
+        bgAudio.play();
+        playPauseBtn.textContent = '⏸️';
+    } else {
+        bgAudio.pause();
+        playPauseBtn.textContent = '▶️';
+    }
+});
+
+nextBtn.addEventListener('click', () => {
+    currentTrack = (currentTrack + 1) % playlist.length;
+    bgAudio.src = playlist[currentTrack];
+    bgAudio.play();
+    playPauseBtn.textContent = '⏸️';
+    updateTrackName();
+});
+
+prevBtn.addEventListener('click', () => {
+    currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
+    bgAudio.src = playlist[currentTrack];
+    bgAudio.play();
+    playPauseBtn.textContent = '⏸️';
+    updateTrackName();
+});
+
+volumeSlider.addEventListener('input', e => {
+    bgAudio.volume = e.target.value;
+});
+</script>
+
+
+</body>
+</html>
